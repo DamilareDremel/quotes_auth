@@ -28,7 +28,13 @@ const handleGetQuotes = async (res: ServerResponse, quoteService: QuoteService) 
 const handleCreateQuote = async (req: IncomingMessage, res: ServerResponse, quoteService: QuoteService) => {
     try {
         const quoteData = await parseRequestBody(req);
-        const newQuote = await quoteService.createQuote(quoteData);
+        // Extract userId from the request as needed; here we assume it's in the body for demonstration
+        const userId = quoteData.userId;
+        if (!userId) {
+            sendResponse(res, 400, "Missing userId in request body");
+            return;
+        }
+        const newQuote = await quoteService.createQuote(quoteData, userId);
         sendResponse(res, 201, "Quote created successfully", newQuote);
     } catch (error) {
         sendResponse(res, 400, "Invalid request body", null, error instanceof Error ? error.message : "Unknown error");
