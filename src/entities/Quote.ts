@@ -1,22 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+// src/entities/Quote.ts
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Quote {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    text: string;
+  @Column()
+  text: string;
 
-    @Column()
-    author: string;
+  @Column()
+  author: string;
 
-    @Column("simple-array")
-    tags: string[];
+  @Column("text", { array: true, default: [] })
+  tags: string[];
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    createdAt: Date;
+ @ManyToOne(() => User, user => user.quotes)
+user: User;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
-    updatedAt: Date;
-} 
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

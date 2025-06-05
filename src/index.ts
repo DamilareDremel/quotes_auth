@@ -1,45 +1,31 @@
 import "reflect-metadata";
-import { createServer } from "http";
+import express from "express";
+import dotenv from "dotenv";
 import { AppDataSource } from "./config/database";
-import { QuoteService } from "./quoteService";
-import { handleRequest } from "./server";
+import authRoutes from "./routes/authRoutes";
+import quoteRoutes from "./routes/quoteRoutes";
 
-/**
- * Main entry point for the Daily Quote API
- * 
- * This API provides the following endpoints:
- * - GET /quotes - Get all quotes
- * - GET /quotes/random - Get a random quote
- * - GET /quotes/:id - Get a specific quote by ID
- * - POST /quotes - Create a new quote
- * - PUT /quotes/:id - Update an existing quote
- * - DELETE /quotes/:id - Delete a quote
- * 
- * No authentication or authorization is required for any endpoint.
- */
+dotenv.config();
 
-// Define server port, using environment variable or default to 3000
-const PORT = process.env.PORT || 3000;
-const quoteService = new QuoteService();
+const app = express();
+app.use(express.json());
+const PORT = process.env.PORT || 4000;
 
-// Initialize TypeORM connection
+// Routes
+app.use("/auth", authRoutes);
+app.use("/quotes", quoteRoutes);
+
+// Start server
 AppDataSource.initialize()
-    .then(() => {
-        console.log("Database connection established");
-
-        // Create HTTP server
-        const server = createServer((req, res) => {
-            handleRequest(req, res, quoteService);
-        });
-
-        // Start server
-        server.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error("Error during Data Source initialization:", error);
+  .then(() => {
+    console.log("Database connection established");
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
     });
+  })
+  .catch((error) => {
+    console.error("Error during Data Source initialization:", error);
+  });
 
 console.log(`
 ==============================================
@@ -55,8 +41,8 @@ POST   /quotes         - Create a new quote
 PUT    /quotes/:id     - Update a quote
 DELETE /quotes/:id     - Delete a quote
 
-No authentication required.
+Authentication required for POST, PUT, DELETE.
 
 Press Ctrl+C to stop the server.
 ==============================================
-`); 
+`);
