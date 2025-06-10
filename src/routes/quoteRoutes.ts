@@ -10,6 +10,21 @@ router.get("/", async (req, res: Response) => {
   res.json(quotes);
 });
 
+// Get random quote
+router.get("/random", async (req, res: Response) => {
+  try {
+    const quote = await quoteService.getRandomQuote();
+    if (!quote) {
+      res.status(404).json({ message: "No quotes found" });
+      return;
+    }
+    res.json(quote);
+  } catch (error: any) {
+    console.error("Random Quote Error:", error);
+    res.status(500).json({ message: "Failed to fetch random quote", error: error.message });
+  }
+});
+
 router.get("/:id", async (req, res: Response) => {
   const quote = await quoteService.getQuoteById(req.params.id);
   if (!quote) {
