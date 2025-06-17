@@ -1,0 +1,18 @@
+[33m5223495[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: clean dependencies and update config
+[33m9a38479[m add missing type definitions for express and cors
+[33m8e1737f[m Add type definitions for express and cors
+[33m1b1e1f1[m Set synchronize to false in production environment
+[33m66b049f[m Updated backend: added new endpoints, bug fixes, and improvements
+[33m2e7b637[m Added random quote endpoint and adjusted route order
+[33m24ef87e[m Modified server.ts
+[33md9994e7[m Adding a simple auth
+[33m276e9b8[m Quotes Api updated with unique id
+[33m9a00e60[m Update package.json to set module type to commonjs and modify start script. Refactor index.ts to streamline server initialization and improve readability. Add UUID extension in migration for quotes table creation.
+[33m00674ac[m Merge pull request #3 from dejibimbolaAyo/minor-fixes
+[33mfd47cea[m Remove quotes.json file and refactor server initialization in index.ts for improved readability. Moved server creation and listening logic outside of the database connection promise to streamline the code structure.
+[33madf883a[m Merge pull request #2 from dejibimbolaAyo/minor-fixes
+[33m1b7d287[m Integrate dotenv for environment variable management and refactor server request handling. Updated index.ts to load environment variables, modified quoteService to use a new QuoteInput interface, and streamlined server request processing with dedicated handler functions for better readability and maintainability. Adjusted database migration to change tags column type for quotes.
+[33mba8635e[m Merge pull request #1 from dejibimbolaAyo/use-db-for-storage
+[33mfa8ee89[m Refactor Daily Quote API to use TypeORM with PostgreSQL. Updated project structure to remove file-based storage, introduced Quote entity and QuoteService for database operations. Enhanced README with installation steps and environment variable configuration. Added migration for quotes table creation and updated package dependencies.
+[33mb94dee7[m Enhance README and refactor server implementation for Daily Quote API. Updated README to include functional programming principles and improved API documentation. Refactored server code to use functional programming style, removing the FileHandler class in favor of standalone functions for file operations. Improved JSON response handling and request parsing. Reformatted quotes.json for better readability.
+[33m1d15893[m initial commit
