@@ -1,12 +1,5 @@
 // src/entities/Quote.ts
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -23,13 +16,11 @@ export class Quote {
   @Column("text", { array: true, default: [] })
   tags: string[];
 
- @ManyToOne(() => User, user => user.quotes)
+  @ManyToOne(() => User)
+@JoinColumn({ name: "userId" })
 user: User;
 
+@Column({ nullable: true })
+userId: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

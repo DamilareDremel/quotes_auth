@@ -4,10 +4,13 @@ import dotenv from "dotenv";
 import { AppDataSource } from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import quoteRoutes from "./routes/quoteRoutes";
+import cors from "cors";
 
 dotenv.config();
-
+  // <--- allow CORS on all routes
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 4000;
 
@@ -26,6 +29,7 @@ AppDataSource.initialize()
   .catch((error) => {
     console.error("Error during Data Source initialization:", error);
   });
+
 
 console.log(`
 ==============================================

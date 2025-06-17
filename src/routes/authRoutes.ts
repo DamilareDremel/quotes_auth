@@ -19,7 +19,7 @@ router.get("/users", async (req: Request, res: Response): Promise<void> => {
 });
 
 router.post("/register", async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
 
   try {
     const existingUser = await userRepo.findOne({ where: { email } });
@@ -29,7 +29,11 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = userRepo.create({ email, password: hashedPassword });
+    const newUser = userRepo.create({
+      email,
+      username,   // ✅ now storing username too
+      password: hashedPassword,
+    });
     await userRepo.save(newUser);
 
     res.status(201).json({ message: "User registered successfully" });
@@ -38,11 +42,16 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+
 router.post("/login", async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
-    const user = await userRepo.findOne({ where: { email } });
+    const user = await userRepo.findOne({
+      where: { email },
+      select: ["id", "email", "username", "password"],
+    });
+
     if (!user) {
       res.status(400).json({ message: "Invalid credentials" });
       return;
@@ -54,14 +63,21 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        username: user.username,
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1d" }
+    );
 
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err });
   }
 });
+
 
 export default router;

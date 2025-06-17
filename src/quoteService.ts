@@ -1,63 +1,65 @@
 import { AppDataSource } from "./config/database";
 import { Quote } from "./entities/Quote";
-import { Repository } from "typeorm";
 import { User } from "./entities/User";
 
-
 interface QuoteInput {
-    text: string;
-    author: string;
-    tags: string[];
+  text: string;
+  author: string;
+  tags: string[];
 }
+
 
 export class QuoteService {
-    private readonly quoteRepository: Repository<Quote>;
+  private quoteRepo = AppDataSource.getRepository(Quote);
+  private userRepo = AppDataSource.getRepository(User);
 
-    constructor() {
-        this.quoteRepository = AppDataSource.getRepository(Quote);
-    }
+  async getAllQuotes() {
+    return await this.quoteRepo.find({
+      relations: ["user"],
+    });
+  }
 
-    async getAllQuotes(): Promise<Quote[]> {
-        return await this.quoteRepository.find();
-    }
+  async getQuoteById(id: string) {
+    return await this.quoteRepo.findOne({
+      where: { id },
+      relations: ["user"],
+    });
+  }
 
-    async getQuoteById(id: string): Promise<Quote | null> {
-  return await this.quoteRepository.findOne({
-    where: { id },
-    relations: ["user"],  // Important: load the user relation
+  async getRandomQuote() {
+    const quotes = await this.quoteRepo.find();
+    if (quotes.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
+  }
+
+  async createQuote(data: QuoteInput, userId: string) {
+  const existingUser = await this.userRepo.findOne({ where: { id: userId } });
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
+
+  const newQuote = this.quoteRepo.create({
+    text: data.text,
+    author: data.author,
+    tags: data.tags, // include tags here
+    user: existingUser,
   });
+
+  return await this.quoteRepo.save(newQuote);
 }
 
 
+  async updateQuote(id: string, quoteData: Partial<QuoteInput>) {
+    const quote = await this.quoteRepo.findOneBy({ id });
+    if (!quote) throw new Error("Quote not found");
 
-    async getRandomQuote(): Promise<Quote | null> {
-        const quotes = await this.quoteRepository.find();
-        if (quotes.length === 0) return null;
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        return quotes[randomIndex];
-    }
+    Object.assign(quote, quoteData);
+    return await this.quoteRepo.save(quote);
+  }
 
-    // In quoteService.ts
-async createQuote(quoteData: QuoteInput, userId: string): Promise<Quote> {
-  const user = await AppDataSource.getRepository(User).findOneBy({ id: userId });
-  if (!user) throw new Error("User not found");
-
-  const quote = this.quoteRepository.create({ ...quoteData, user });
-  return await this.quoteRepository.save(quote);
+  async deleteQuote(id: string) {
+    const result = await this.quoteRepo.delete({ id });
+    return typeof result.affected === "number" && result.affected > 0;
+  }
 }
-
-
-
-    async updateQuote(id: string, quoteData: Partial<QuoteInput>): Promise<Quote | null> {
-        const quote = await this.quoteRepository.findOneBy({ id });
-        if (!quote) return null;
-
-        Object.assign(quote, quoteData);
-        return await this.quoteRepository.save(quote);
-    }
-
-    async deleteQuote(id: string): Promise<boolean> {
-        const result = await this.quoteRepository.delete(id);
-        return (result.affected ?? 0) > 0;
-    }
-} 

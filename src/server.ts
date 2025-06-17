@@ -30,11 +30,14 @@ const handleCreateQuote = async (req: IncomingMessage, res: ServerResponse, quot
         const quoteData = await parseRequestBody(req);
         // Extract userId from the request as needed; here we assume it's in the body for demonstration
         const userId = quoteData.userId;
+        const userEmail = quoteData.userEmail; // Extract userEmail from request body if present
         if (!userId) {
-            sendResponse(res, 400, "Missing userId in request body");
-            return;
-        }
-        const newQuote = await quoteService.createQuote(quoteData, userId);
+    sendResponse(res, 400, "Missing userId in request body");
+    return;
+}
+const newQuote = await quoteService.createQuote(quoteData, userId);
+
+
         sendResponse(res, 201, "Quote created successfully", newQuote);
     } catch (error) {
         sendResponse(res, 400, "Invalid request body", null, error instanceof Error ? error.message : "Unknown error");
